@@ -27,13 +27,13 @@ def main():
                 x, y = j.get_axis(0), j.get_axis(1)
                 Vx = x * 200
                 Vy = y * 200
-                V1 = -Vx
+                V1 = Vx
                 V21 = (float(1) / 2) * Vx
                 V22 = (float(math.sqrt(3)) / 2) * Vy
-                V2 = V21 - V22
+                V2 = -V21 + V22
                 V31 = (float(1) / 2) * Vx
                 V32 = (float(math.sqrt(3)) / 2) * Vy
-                V3 = V31 + V32
+                V3 = -V31 - V32
                 if V1 <= 0:
                     sp1 = int(-V1 + 1024) * 100000000
                 elif V1 > 0:
