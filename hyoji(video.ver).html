@@ -35,7 +35,7 @@ document.body.appendChild(renderer.domElement);
 // シーンを生成
 var scene = new THREE.Scene();　　　　　　　　　　　　//土台部分
 // カメラを生成
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);　⇒カメラの設定（視野角、縦横の大きさ、手前の見える距離、奥の見える距離）
+var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);　//⇒カメラの設定（視野角、縦横の大きさ、手前の見える距離、奥の見える距離）
 // VR用コントローラを生成
 var controls = new THREE.VRControls(camera);　　　　　　　//カメラの指定
 // VR用エフェクトを生成
