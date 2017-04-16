@@ -1,0 +1,1 @@
+LD_LIBRARY_PATH=mjpg-streamer-master/mjpg-streamer-experimental/ mjpg-streamer-master/mjpg-streamer-experimental/mjpg_streamer -i "input_uvc.so -d /dev/video0" -o "output_http.so -w mjpg-streamer-master/mjpg-streamer-experimental/wwwyoso/ -p 8080"
