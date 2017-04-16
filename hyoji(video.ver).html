@@ -80,8 +80,6 @@ function onEarthTextureLoaded(texture) {
     texture.magFilter = THREE.LinearFilter;
     texture.format = THREE.RGBFormat;
     
-    //マテリアルに動画を貼る
-    
     var faceVertexUvs = geometry.faceVertexUvs[ 0 ];　　//ここから画像の引き延ばし作業
     for ( i = 0; i < faceVertexUvs.length; i++ ) {
       var uvs = faceVertexUvs[ i ];
