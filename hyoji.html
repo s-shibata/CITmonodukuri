@@ -31,25 +31,18 @@ body {
 // レンダラを生成　　　　　　　　　　　　　　　　　　　　　　
 var renderer = new THREE.WebGLRenderer({antialias: false});　　　　　　//antialiasがtrueだとエッジがなめらかになる
 renderer.setPixelRatio(window.devicePixelRatio);
-
 document.body.appendChild(renderer.domElement);
-
 // シーンを生成
 var scene = new THREE.Scene();　　　　　　　　　　　　//土台部分
-
 // カメラを生成
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);　⇒カメラの設定（視野角、縦横の大きさ、手前の見える距離、奥の見える距離）
-
 // VR用コントローラを生成
 var controls = new THREE.VRControls(camera);　　　　　　　//カメラの指定
-
 // VR用エフェクトを生成
 var effect = new THREE.VREffect(renderer);　　　　　　　　//2画面に分ける　　　　　　　　
 effect.setSize(window.innerWidth, window.innerHeight);
-
 // VRマネージャの生成
 var manager = new WebVRManager(renderer, effect);
-
 //////////////////////////////////////////////////
 // 各種オブジェクトのセットアップ
 //  setTimeout("location.reload()",180000);　　　　　　　　　　//3分ごとにリセット
@@ -64,10 +57,8 @@ function hyoji(){
 }
 function onEarthTextureLoaded(texture) {
     scene.remove(earth);                             //球体をリセット
-
     texture.wrapS = THREE.RepeatWrapping;　　　　　　//縦にラッピング（今回は一枚の静止画だからいらないはず）
     texture.wrapT = THREE.RepeatWrapping;　　　　　　//横にラッピング（..）
-
     var geometry = new THREE.SphereGeometry(1, 32, 32); //球体の大きさ（半径、縦に何分割か、横に何分割か）
     geometry.scale(-1, 1, 1);　　　　　　　　　　　　　　//球体の倍率（-1倍にすることで貼り付けた画像が内側に見える）
     var faceVertexUvs = geometry.faceVertexUvs[ 0 ];　　//ここから画像の引き延ばし作業
@@ -78,7 +69,6 @@ function onEarthTextureLoaded(texture) {
         var x = face.vertexNormals[ j ].x;
         var y = face.vertexNormals[ j ].y;
         var z = face.vertexNormals[ j ].z;
-
         if (i < faceVertexUvs.length / 2) {
           var correction = (x == 0 && z == 0) ? 1 : (Math.acos(y) / Math.sqrt(x * x + z * z)) * (2 / Math.PI);
           uvs[ j ].x = x * (428 / 1920) * correction + (480 / 1920);
@@ -94,13 +84,11 @@ function onEarthTextureLoaded(texture) {
         map: texture,　　　　　　　　　　　　　　　　　//画像の貼り付け
         color: 0xffffff				　　　
     });
-
     earth = new THREE.Mesh(geometry, material);  
     earth.position.z = 0;
     earth.rotation.set(0,0,-Math.PI/2); //VRとthetaの向き合わせ
     scene.add(earth);　　　　　　　　　　//sceneに球体をおく
     console.log('reloaded');    //consoleはprintfみたいなやつ
-
     material.dispose();
     geometry.dispose();
     texture.dispose();
@@ -108,32 +96,24 @@ function onEarthTextureLoaded(texture) {
     //renderTarget.dispose();
     console.log('removed');
 }
-
 var light = new THREE.AmbientLight(0xffffff);　　//ライトをつけて明るく！
 light.position.set(1, 1, 1);
 scene.add(light);
-
 //////////////////////////////////////////////////
-
 // アニメーションループ
 var lastRender = 0;
 function animate(timestamp) {
     //var delta = Math.min(timestamp - lastRender, 500);　　　//一定時間で動くようにするとこ
     //lastRender = timestamp;
-
     //earth.rotation.x += delta * 0.000015;　　　　　　　　　//ぐるぐるまわしたり
     //earth.rotation.y += delta * 0.000025;
-
     // VRコントローラのupdate
     controls.update();　　　　　　　　　　　　　　　　　//updateしないと最初のスマホの向きでカメラが
-
     // VRマネージャを通してシーンをレンダリング
     manager.render(scene, camera, timestamp);
-
     // アニメーションループ
     requestAnimationFrame(animate);
 }
-
 // アニメーションの開始
 animate(performance ? performance.now() : Date.now());
 </script>
