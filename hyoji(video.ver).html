@@ -25,9 +25,18 @@ body {
 <script src="./webvr-manager.js"></script>
 </head>
 
-<body>　　　//main文的な感じ
-
-<script>　　　　　　　　　　　　　　　　　　　　　　　　//scriptは↑みたいにどっかから読み込んでもいいし、自分で書いてもいい
+<body>
+<div id = "video"></div>
+<script src="/js/ogvjs-1.1/ogv.js"></script>
+<script>
+var video = document.getElementById("video");
+var player = new OGVPlayer();
+video.appendChild(player);
+player.src = "/path/to/xxx.ogv"; // 動画ファイル
+player.muted = true; // ミュート
+player.load();
+player.play();
+　　　　　　　　　　　　　　　　　　　　　　　//scriptは↑みたいにどっかから読み込んでもいいし、自分で書いてもいい
 // レンダラを生成　　　　　　　　　　　　　　　　　　　　　　
 var renderer = new THREE.WebGLRenderer({antialias: false});　　　　　　//antialiasがtrueだとエッジがなめらかになる
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -58,11 +67,22 @@ function hyoji(){
 }
 function onEarthTextureLoaded(texture) {
     //scene.remove(earth);                             //球体をリセット
-    texture.wrapS = THREE.RepeatWrapping;　　　　　　//縦にラッピング（今回は一枚の静止画だからいらないはず）
-    texture.wrapT = THREE.RepeatWrapping;　　　　　　//横にラッピング（..）
+    //exture.wrapS = THREE.RepeatWrapping;　　　　　　//縦にラッピング（今回は一枚の静止画だからいらないはず）
+    //texture.wrapT = THREE.RepeatWrapping;　　　　　　//横にラッピング（..）
+    //球体を用意
     var geometry = new THREE.SphereGeometry(1, 32, 32); //球体の大きさ（半径、縦に何分割か、横に何分割か）
     geometry.scale(-1, 1, 1);　　　　　　　　　　　　　　//球体の倍率（-1倍にすることで貼り付けた画像が内側に見える）
-    /*var faceVertexUvs = geometry.faceVertexUvs[ 0 ];　　//ここから画像の引き延ばし作業
+    
+    
+    //three.js用のテクスチャに変換
+    var texture = new THREE.VideoTexture( video );
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.format = THREE.RGBFormat;
+    
+    //マテリアルに動画を貼る
+    
+    var faceVertexUvs = geometry.faceVertexUvs[ 0 ];　　//ここから画像の引き延ばし作業
     for ( i = 0; i < faceVertexUvs.length; i++ ) {
       var uvs = faceVertexUvs[ i ];
       var face = geometry.faces[ i ];
@@ -79,7 +99,7 @@ function onEarthTextureLoaded(texture) {
         uvs[ j ].x = -1 * x * (428 / 1920) * correction + (1440 / 1920);
         uvs[ j ].y = z * (428 / 1080) * correction + (600 / 1080);
         }
-      }*/
+      }
     }
     var material = new THREE.MeshBasicMaterial({
         map: texture,　　　　　　　　　　　　　　　　　//画像の貼り付け
