@@ -21,30 +21,6 @@ def main():
         while True:
             conn,address = sock.accept()
             with closing(conn):
-"2joyjoy.py" 46L, 1261C                                       1,1          先頭
-from __future__ import print_function
-import socket
-from contextlib import closing
-from motor import Ax12
-
-self = Ax12()
-self.setAngleLimit(1,0,0)
-self.setAngleLimit(2,0,0)
-self.setAngleLimit(3,0,0)
-
-def main():
-    host = 'soiya.local'
-    port = 9112
-    backlog = 10
-    bufsize = 4096
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    with closing(sock):
-        sock.bind((host,port))
-        sock.listen(backlog)
-        while True:
-            conn,address = sock.accept()
-            with closing(conn):
                 msg = conn.recv(bufsize)
                 sp1 = int(msg)/100000000
                 sp2 =(int(msg)-(sp1*100000000))/10000
