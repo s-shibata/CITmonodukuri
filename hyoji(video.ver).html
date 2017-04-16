@@ -52,16 +52,17 @@ var earthLoader = new THREE.TextureLoader();　　　　　　　//テクスチ�
 //earthLoader.load('./earth.jpg', onEarthTextureLoaded);　
 setInterval("hyoji()",500);　　　　　　　　　　　　　　　　//5msごとに
 function hyoji(){
-    var pano = './?action=snapshot'　　　　　　　　　　　　　
+    var pano = './?action=stream'
+    //var pano = './?action=snapshot'　　　　　　　　　　　　　
     earthLoader.load(pano, onEarthTextureLoaded);
 }
 function onEarthTextureLoaded(texture) {
-    scene.remove(earth);                             //球体をリセット
+    //scene.remove(earth);                             //球体をリセット
     texture.wrapS = THREE.RepeatWrapping;　　　　　　//縦にラッピング（今回は一枚の静止画だからいらないはず）
     texture.wrapT = THREE.RepeatWrapping;　　　　　　//横にラッピング（..）
     var geometry = new THREE.SphereGeometry(1, 32, 32); //球体の大きさ（半径、縦に何分割か、横に何分割か）
     geometry.scale(-1, 1, 1);　　　　　　　　　　　　　　//球体の倍率（-1倍にすることで貼り付けた画像が内側に見える）
-    var faceVertexUvs = geometry.faceVertexUvs[ 0 ];　　//ここから画像の引き延ばし作業
+    /*var faceVertexUvs = geometry.faceVertexUvs[ 0 ];　　//ここから画像の引き延ばし作業
     for ( i = 0; i < faceVertexUvs.length; i++ ) {
       var uvs = faceVertexUvs[ i ];
       var face = geometry.faces[ i ];
@@ -78,7 +79,7 @@ function onEarthTextureLoaded(texture) {
         uvs[ j ].x = -1 * x * (428 / 1920) * correction + (1440 / 1920);
         uvs[ j ].y = z * (428 / 1080) * correction + (600 / 1080);
         }
-      }
+      }*/
     }
     var material = new THREE.MeshBasicMaterial({
         map: texture,　　　　　　　　　　　　　　　　　//画像の貼り付け
