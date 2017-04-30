@@ -67,8 +67,8 @@ function hyoji(){
 }
 function onEarthTextureLoaded(texture) {
     //scene.remove(earth);                             //球体をリセット
-    //exture.wrapS = THREE.RepeatWrapping;　　　　　　//縦にラッピング（今回は一枚の静止画だからいらないはず）
-    //texture.wrapT = THREE.RepeatWrapping;　　　　　　//横にラッピング（..）
+    texture.wrapS = THREE.RepeatWrapping;　　　　　　//縦にラッピング（今回は一枚の静止画だからいらないはず）
+    texture.wrapT = THREE.RepeatWrapping;　　　　　　//横にラッピング（..）
     //球体を用意
     var geometry = new THREE.SphereGeometry(1, 32, 32); //球体の大きさ（半径、縦に何分割か、横に何分割か）
     geometry.scale(-1, 1, 1);　　　　　　　　　　　　　　//球体の倍率（-1倍にすることで貼り付けた画像が内側に見える）
