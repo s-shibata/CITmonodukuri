@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>スマホVRサンプル</title>
+<style>
+body {
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    color: #fff;
+    margin: 0px;
+    padding: 0;
+    overflow: hidden;
+}
+</style>
+<script src="./es6-promise.js"></script>               //importみたいなもの、ライブラリを読み込む
+<script src="./three.min.js"></script>
+<script src="./VRControls.js"></script>
+<script src="./VREffect.js"></script>
+<script src="./webvr-polyfill.js"></script>
+<script src="./webvr-manager.js"></script>
+</head>
+
+<body>　　　//main文的な感じ
+
+<script>　　　　　　　　　　　　　　　　　　　　　　　　//scriptは↑みたいにどっかから読み込んでもいいし、自分で書いてもいい
+// レンダラを生成　　　　　　　　　　　　　　　　　　　　　　
+var renderer = new THREE.WebGLRenderer({antialias: false});　　　　　　//antialiasがtrueだとエッジがなめらかになる
+renderer.setPixelRatio(window.devicePixelRatio);
+document.body.appendChild(renderer.domElement);
+// シーンを生成
+var scene = new THREE.Scene();　　　　　　　　　　　　//土台部分
+// カメラを生成
+var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);　⇒カメラの設定（視野角、縦横の大きさ、手前の見える距離、奥の見える距離）
+// VR用コントローラを生成
+var controls = new THREE.VRControls(camera);　　　　　　　//カメラの指定
+// VR用エフェクトを生成
+var effect = new THREE.VREffect(renderer);　　　　　　　　//2画面に分ける　　　　　　　　
+effect.setSize(window.innerWidth, window.innerHeight);
+// VRマネージャの生成
+var manager = new WebVRManager(renderer, effect);
+//////////////////////////////////////////////////
+// 各種オブジェクトのセットアップ
+//  setTimeout("location.reload()",180000);　　　　　　　　　　//3分ごとにリセット
+// 地球オブジェクトの生成
+var earth = new THREE.Object3D();　　　　　　　　　　　　//3Dオブジェクトを作成
+var earthLoader = new THREE.TextureLoader();　　　　　　　//テクスチャをロード
+//earthLoader.load('./earth.jpg', onEarthTextureLoaded);　
+setInterval("hyoji()",500);　　　　　　　　　　　　　　　　//5msごとに
+function hyoji(){
+    var pano = './?action=stream'　　　　　　　　　　　　　
+    earthLoader.load(pano, onEarthTextureLoaded);
+}
+function onEarthTextureLoaded(texture) {
+    //scene.remove(earth);                             //球体をリセット
+    texture.wrapS = THREE.RepeatWrapping;　　　　　　//縦にラッピング（今回は一枚の静止画だからいらないはず）
+    texture.wrapT = THREE.RepeatWrapping;　　　　　　//横にラッピング（..）
+    var geometry = new THREE.SphereGeometry(1, 32, 32); //球体の大きさ（半径、縦に何分割か、横に何分割か）
+    geometry.scale(-1, 1, 1);　　　　　　　　　　　　　　//球体の倍率（-1倍にすることで貼り付けた画像が内側に見える）
+    var faceVertexUvs = geometry.faceVertexUvs[ 0 ];　　//ここから画像の引き延ばし作業
+    for ( i = 0; i < faceVertexUvs.length; i++ ) {
+      var uvs = faceVertexUvs[ i ];
+      var face = geometry.faces[ i ];
+      for ( var j = 0; j < 3; j ++ ) {
+        var x = face.vertexNormals[ j ].x;
+        var y = face.vertexNormals[ j ].y;
+        var z = face.vertexNormals[ j ].z;
+        if (i < faceVertexUvs.length / 2) {
+          var correction = (x == 0 && z == 0) ? 1 : (Math.acos(y) / Math.sqrt(x * x + z * z)) * (2 / Math.PI);
+          uvs[ j ].x = x * (428 / 1920) * correction + (480 / 1920);
+          uvs[ j ].y = z * (428 / 1080) * correction + (600 / 1080);
+        } else {
+        var correction = ( x == 0 && z == 0) ? 1 : (Math.acos(-y) / Math.sqrt(x * x + z * z)) * (2 / Math.PI);
+        uvs[ j ].x = -1 * x * (428 / 1920) * correction + (1440 / 1920);
+        uvs[ j ].y = z * (428 / 1080) * correction + (600 / 1080);
+        }
+      }
+    }
+    var material = new THREE.MeshBasicMaterial({
+        map: texture,　　　　　　　　　　　　　　　　　//画像の貼り付け
+        color: 0xffffff				　　　
+    });
+    earth = new THREE.Mesh(geometry, material);  
+    earth.position.z = 0;
+    earth.rotation.set(0,0,-Math.PI/2); //VRとthetaの向き合わせ
+    scene.add(earth);　　　　　　　　　　//sceneに球体をおく
+    console.log('reloaded');    //consoleはprintfみたいなやつ
+    //material.dispose();
+    //geometry.dispose();
+    //texture.dispose();
+    //delete earth;
+    //renderTarget.dispose();
+    console.log('removed');
+}
+var light = new THREE.AmbientLight(0xffffff);　　//ライトをつけて明るく！
+light.position.set(1, 1, 1);
+scene.add(light);
+//////////////////////////////////////////////////
+// アニメーションループ
+var lastRender = 0;
+function animate(timestamp) {
+    //var delta = Math.min(timestamp - lastRender, 500);　　　//一定時間で動くようにするとこ
+    //lastRender = timestamp;
+    //earth.rotation.x += delta * 0.000015;　　　　　　　　　//ぐるぐるまわしたり
+    //earth.rotation.y += delta * 0.000025;
+    // VRコントローラのupdate
+    controls.update();　　　　　　　　　　　　　　　　　//updateしないと最初のスマホの向きでカメラが
+    // VRマネージャを通してシーンをレンダリング
+    manager.render(scene, camera, timestamp);
+    // アニメーションループ
+    requestAnimationFrame(animate);
+}
+// アニメーションの開始
+animate(performance ? performance.now() : Date.now());
+</script>
+
+</body>
+</html>
